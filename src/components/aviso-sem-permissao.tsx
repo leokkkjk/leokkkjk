@@ -1,3 +1,6 @@
+import { IconeAlerta } from "@/components/icons";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+
 /**
  * Aviso exibido quando o proxy bloqueou o acesso à rota de outro perfil.
  */
@@ -5,9 +8,15 @@ export default function AvisoSemPermissao({ erro }: { erro?: string }) {
   if (erro !== "sem-permissao") return null;
 
   return (
-    <p className="m-0 rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900">
-      Você não tem permissão para acessar a área que tentou abrir e foi trazido
-      de volta para a sua própria área.
-    </p>
+    <Alert variant="atencao">
+      <IconeAlerta />
+      <div className="space-y-1">
+        <AlertTitle>Acesso não autorizado para o seu perfil</AlertTitle>
+        <AlertDescription>
+          Você tentou abrir a área de outro perfil e voltou para a sua. O banco continua
+          aplicando o RLS: mesmo que a rota passasse, os dados não vazar.
+        </AlertDescription>
+      </div>
+    </Alert>
   );
 }

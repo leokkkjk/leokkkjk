@@ -1,1 +1,92 @@
 @import "tailwindcss";
+
+/* =============================================================================
+   DESIGN SYSTEM — Fase 0 (polimento visual)
+
+   Regra deste arquivo: TODA cor usada no app nasce de um token aqui. Nenhum
+   componente usa hex/oklch solto, e nenhum `bg-[#...]` existe no código.
+
+   Paleta (enxuta de propósito):
+     ink      -> neutros escuros (fundo do menu, textos, bordas, superfícies)
+     acento   -> A ÚNICA cor de destaque (ações primárias, item ativo, foco)
+     positivo / atencao / critico -> só para estado (ativo, aviso, erro)
+
+   Sem dark mode (decisão do brief). Sem imagem externa.
+   ============================================================================= */
+
+@theme {
+  /* Fonte vem do next/font (src/app/layout.tsx) e entra aqui por variável. */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* ------------------------------- neutros ------------------------------- */
+  --color-ink-50: oklch(98.4% 0.003 265);
+  --color-ink-100: oklch(96.6% 0.005 265);
+  --color-ink-200: oklch(92.6% 0.008 265);
+  --color-ink-300: oklch(86.5% 0.012 265);
+  --color-ink-400: oklch(70.5% 0.018 265);
+  --color-ink-500: oklch(55.5% 0.02 265);
+  --color-ink-600: oklch(43.5% 0.022 265);
+  --color-ink-700: oklch(35% 0.024 265);
+  --color-ink-800: oklch(27% 0.026 265);
+  --color-ink-900: oklch(21% 0.028 265);
+  --color-ink-950: oklch(14.5% 0.03 265);
+
+  /* --------------------------- destaque (único) -------------------------- */
+  --color-acento-50: oklch(96.8% 0.02 280);
+  --color-acento-100: oklch(93.6% 0.04 280);
+  --color-acento-200: oklch(87% 0.07 280);
+  --color-acento-300: oklch(78.5% 0.11 280);
+  --color-acento-400: oklch(68% 0.16 280);
+  --color-acento-500: oklch(58% 0.2 280);
+  --color-acento-600: oklch(50% 0.21 280);
+  --color-acento-700: oklch(42% 0.19 280);
+  --color-acento-800: oklch(35% 0.16 280);
+  --color-acento-900: oklch(29% 0.13 280);
+
+  /* ------------------------------- estados ------------------------------- */
+  --color-positivo-50: oklch(96.5% 0.03 165);
+  --color-positivo-300: oklch(83% 0.11 165);
+  --color-positivo-600: oklch(52% 0.13 165);
+  --color-positivo-700: oklch(43% 0.11 165);
+
+  --color-atencao-50: oklch(97% 0.04 85);
+  --color-atencao-300: oklch(85% 0.12 85);
+  --color-atencao-600: oklch(62% 0.14 75);
+  --color-atencao-700: oklch(50% 0.12 75);
+  --color-atencao-900: oklch(30% 0.06 75);
+
+  --color-critico-50: oklch(96.5% 0.025 20);
+  --color-critico-300: oklch(84% 0.08 20);
+  --color-critico-600: oklch(55% 0.19 22);
+  --color-critico-700: oklch(46% 0.18 22);
+
+  /* ------------------------------ feedback ------------------------------- */
+  --radius-card: 0.875rem;
+  --shadow-card: 0 1px 2px 0 oklch(21% 0.028 265 / 0.06), 0 8px 24px -12px oklch(21% 0.028 265 / 0.14);
+  --shadow-painel: 0 1px 3px 0 oklch(14.5% 0.03 265 / 0.18), 0 24px 48px -24px oklch(14.5% 0.03 265 / 0.35);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    font-family: var(--font-sans);
+  }
+
+  ::selection {
+    background-color: var(--color-acento-500);
+    color: var(--color-acento-50);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-acento-500);
+    outline-offset: 2px;
+  }
+
+  /* Scrollbar discreta e coerente com os neutros escuros. */
+  * {
+    scrollbar-color: var(--color-ink-300) transparent;
+  }
+}

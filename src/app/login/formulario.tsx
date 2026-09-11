@@ -3,93 +3,106 @@
 import { useActionState, useState } from "react";
 
 import { entrarAction, type EstadoLogin } from "@/app/actions/auth";
+import { IconeOlho, IconeOlhoFechado, IconeSetaDireita } from "@/components/icons";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 const estadoInicial: EstadoLogin = { erro: null };
 
-const CONTAS_DEMO = [
-  { email: "master1@demo.com", senha: "master123", papel: "M1 · Master — vê a empresa inteira" },
-  { email: "gerente1@demo.com", senha: "gerente123", papel: "G1 · Gerente — equipe A" },
-  { email: "gerente2@demo.com", senha: "gerente123", papel: "G2 · Gerente — equipe B" },
-  { email: "vendedor1@demo.com", senha: "vendedor123", papel: "V1 · Vendedor — só ele mesmo" },
-  { email: "parceiro@demo.com", senha: "parceiro123", papel: "PX · Parceiro externo" },
-  { email: "master2@outra.com", senha: "master123", papel: "M2 · Master de outra empresa" },
-];
-
+/**
+ * Formulário de login (client): controla os campos para que a senha digitada
+ * não suma quando a action devolve erro — o React limpa campos não controlados
+ * após o submit.
+ *
+ * A lista de usuários de teste FOI REMOVIDA daqui (brief desta sessão): as
+ * credenciais de demonstração vivem apenas no README.
+ */
 export default function FormularioLogin({ proximo }: { proximo: string }) {
   const [estado, acao, pendente] = useActionState(entrarAction, estadoInicial);
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+  const [mostrarSenha, setMostrarSenha] = useState(false);
+  const invalido = Boolean(estado.erro);
 
   return (
-    <div className="space-y-4">
-      <form action={acao} className="space-y-4 rounded-xl border border-slate-300 bg-white p-5">
-        <input type="hidden" name="next" value={proximo} />
+    <form action={acao} className="space-y-5" noValidate>
+      <input type="hidden" name="next" value={proximo} />
 
-        <label className="block space-y-1 text-sm text-slate-800">
-          <span className="font-medium">E-mail</span>
-          <input
-            name="email"
-            type="email"
-            autoComplete="username"
-            required
-            value={email}
-            onChange={(evento) => setEmail(evento.target.value)}
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-900"
-          />
-        </label>
+      <div className="space-y-2">
+        <Label htmlFor="email">E-mail</Label>
+        <Input
+          id="email"
+          name="email"
+          type="email"
+          inputMode="email"
+          autoComplete="username"
+          autoCapitalize="none"
+          spellCheck={false}
+          required
+          placeholder="voce@empresa.com"
+          value={email}
+          onChange={(evento) => setEmail(evento.target.value)}
+          aria-invalid={invalido}
+        />
+      </div>
 
-        <label className="block space-y-1 text-sm text-slate-800">
-          <span className="font-medium">Senha</span>
-          <input
+      <div className="space-y-2">
+        <Label htmlFor="senha">Senha</Label>
+        <div className="relative">
+          <Input
+            id="senha"
             name="senha"
-            type="password"
+            type={mostrarSenha ? "text" : "password"}
             autoComplete="current-password"
             required
+            placeholder="••••••••"
+            className="pr-12"
             value={senha}
             onChange={(evento) => setSenha(evento.target.value)}
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-900"
+            aria-invalid={invalido}
           />
-        </label>
+          <button
+            type="button"
+            onClick={() => setMostrarSenha((valor) => !valor)}
+            aria-label={mostrarSenha ? "Ocultar a senha" : "Mostrar a senha"}
+            className="absolute inset-y-0 right-0 flex w-12 items-center justify-center rounded-r-lg text-ink-400 transition-colors duration-150 hover:text-ink-700"
+          >
+            {mostrarSenha ? <IconeOlhoFechado className="size-4" /> : <IconeOlho className="size-4" />}
+          </button>
+        </div>
+      </div>
 
-        {estado.erro ? (
-          <p className="m-0 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{estado.erro}</p>
-        ) : null}
+      {estado.erro ? (
+        <Alert variant="critico">
+          <div className="space-y-1">
+            <AlertTitle>Não foi possível entrar</AlertTitle>
+            <AlertDescription>{estado.erro}</AlertDescription>
+          </div>
+        </Alert>
+      ) : null}
 
-        <button
-          type="submit"
-          disabled={pendente}
-          className="w-full rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
-        >
-          {pendente ? "Entrando..." : "Entrar"}
-        </button>
-      </form>
+      <Button type="submit" size="lg" className="w-full" disabled={pendente}>
+        {pendente ? (
+          <>
+            <Spinner />
+            Entrando…
+          </>
+        ) : (
+          <>
+            Entrar
+            <IconeSetaDireita />
+          </>
+        )}
+      </Button>
+    </form>
+  );
+}
 
-      <section className="rounded-xl border border-slate-300 bg-white p-5">
-        <h2 className="m-0 text-sm font-semibold text-slate-900">Usuários de teste (seed)</h2>
-        <p className="mt-1 mb-3 text-xs text-slate-600">
-          Clique para preencher e conferir o que cada perfil enxerga. Estes logins só
-          existem depois de rodar <code>node scripts/seed.ts</code>.
-        </p>
-        <ul className="m-0 grid list-none gap-2 p-0 sm:grid-cols-2">
-          {CONTAS_DEMO.map((conta) => (
-            <li key={conta.email}>
-              <button
-                type="button"
-                onClick={() => {
-                  setEmail(conta.email);
-                  setSenha(conta.senha);
-                }}
-                className="w-full rounded-md border border-slate-200 px-3 py-2 text-left transition hover:border-slate-900"
-              >
-                <span className="block font-mono text-[11px] text-slate-900">{conta.email}</span>
-                <span className="block text-[11px] text-slate-500">
-                  {conta.papel} · {conta.senha}
-                </span>
-              </button>
-            </li>
-          ))}
-        </ul>
-      </section>
-    </div>
+/** Anel girando — única animação de "carregando", feita com transform. */
+function Spinner() {
+  return (
+    <span className="size-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
   );
 }
